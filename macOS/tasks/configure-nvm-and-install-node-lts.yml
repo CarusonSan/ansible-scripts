@@ -1,0 +1,28 @@
+- name: Check if folder nvm exists
+  stat:
+    path: /Users/{{ansible_user_id}}/.nvm
+  register: nvm_check
+- name: Create nvm folder
+  file:
+    path: /Users/{{ansible_user_id}}/.nvm
+    state: directory
+  when:
+    - not nvm_check.stat.exists
+- name: Add nvm environment variables to .zshrc (Intel Based Macs)
+  blockinfile:
+    dest: /Users/{{ansible_user_id}}/.zshrc
+    block: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh" # This loads nvm
+      [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+  when: ansible_architecture == "x86_64"
+- name: Add nvm environment variables to .zshrc (Apple-Silicon Based Macs)
+  blockinfile:
+    dest: /Users/{{ansible_user_id}}/.zshrc
+    block: |
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh" # This loads nvm
+      [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+  when: ansible_architecture == "arm64"
+- name: Install Node LTS and set version
+  shell: ". /Users/{{ansible_user_id}}/.nvm/nvm.sh && nvm install --lts && nvm alias default node"

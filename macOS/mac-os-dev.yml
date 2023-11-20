@@ -1,0 +1,82 @@
+- name: macOS Development Environment Setup
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    brew_cask_packages:
+      - dbeaver-community
+      - google-chrome
+      - logi-options-plus
+      - spotify
+      - visual-studio-code
+      - warp
+      - whatsapp
+    brew_packages:
+      - docker
+      - gh
+      - nvm
+      - yarn
+    upgrade_homebrew_packages: true
+
+  vars_prompt:
+    - name: initial_setup
+      prompt: Is this a new Mac Dev setup (yes/no)?
+      private: false
+
+  pre_tasks:
+    - name: Check if Homebrew is installed
+      stat:
+        path: /usr/local/bin/brew
+      register: homebrew_check
+
+    - name: Installing Homebrew
+      shell: >-
+        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL
+        https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      when:
+        - not homebrew_check.stat.exists
+
+  tasks:
+    - name: Updating Homebrew
+      homebrew:
+        update_homebrew: true
+      when: homebrew_check.stat.exists
+
+    - name: Upgrading Homebrew Packages
+      homebrew:
+        upgrade_all: "{{ upgrade_homebrew_packages }}"
+      register: result
+      until: result is successful
+      when: homebrew_check.stat.exists
+
+    - name: Installing Homebrew Cask Packages
+      homebrew_cask:
+        name: "{{ brew_cask_packages }}"
+        state: present
+      register: result
+      until: result is successful
+      when:
+        - homebrew_check.stat.exists
+        - not upgrade_homebrew_packages
+
+    - name: Installing Homebrew Packages
+      homebrew:
+        name: "{{ brew_packages }}"
+        state: present
+      register: result
+      until: result is successful
+      when:
+        - homebrew_check.stat.exists
+        - not upgrade_homebrew_packages
+
+    - name: Configure nvm and install Node LTS
+      import_tasks: tasks/configure-nvm-and-install-node-lts.yml
+      when: initial_setup == 'yes' or initial_setup == 'y' or initial_setup == 'Yes' or initial_setup == 'Y' or initial_setup == 'YES'
+
+    - name: Set git config email
+      shell: git config --global user.email "carsoncheung@hotmail.co.uk"
+      when: initial_setup == 'yes' or initial_setup == 'y' or initial_setup == 'Yes' or initial_setup == 'Y' or initial_setup == 'YES'
+
+    - name: Set git config name
+      shell: git config --global user.name "Carson Cheung"
+      when: initial_setup == 'yes' or initial_setup == 'y' or initial_setup == 'Yes' or initial_setup == 'Y' or initial_setup == 'YES'
