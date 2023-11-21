@@ -10,12 +10,15 @@
       - logi-options-plus
       - spotify
       - visual-studio-code
+      - vlc
+      - vnc-viewer
       - warp
       - whatsapp
     brew_packages:
       - gh
       - m-cli
       - nvm
+      - pnpm
       - yarn
     upgrade_homebrew_packages: true
 
