@@ -1,0 +1,68 @@
+- name: Remove all items from the Dock
+  shell: defaults write com.apple.dock persistent-apps -array
+
+- name: Add DBeaver to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/DBeaver.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Add Google Chrome to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Google Chrome.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Add Visual Studio Code to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Visual Studio Code.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Add Warp to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Warp.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Add Notes to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/Notes.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Add Spotify to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Spotify.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Add App Store to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/App Store.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Add System Preferences to Dock
+  shell: defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'
+
+- name: Reduce the size of the Dock to 42 points
+  shell: defaults write com.apple.dock tilesize -int 42
+
+- name: Show the Dock on the left-hand side
+  shell: /usr/local/bin/m dock position LEFT
+
+- name: Arrange Files by Kind
+  shell: |
+    /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy kind" ~/Library/Preferences/com.apple.finder.plist
+    /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy kind" ~/Library/Preferences/com.apple.finder.plist
+
+- name: Set the Grid Spacing for Files
+  shell: |
+    /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 60" ~/Library/Preferences/com.apple.finder.plist
+    /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:gridSpacing 44" ~/Library/Preferences/com.apple.finder.plist
+
+- name: Use Smaller Icons
+  shell: |
+    /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:iconSize 54" ~/Library/Preferences/com.apple.finder.plist
+    /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 70" ~/Library/Preferences/com.apple.finder.plist
+
+- name: Show ~/Library
+  shell: chflags nohidden ~/Library
+
+- name: Show Drives on the Desktop
+  shell: defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
+
+- name: Show External Drives on the Desktop
+  shell: defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+
+- name: Show Removable Media on the Desktop
+  shell: defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+
+- name: Show the Status Bar in Finder
+  shell: defaults write com.apple.finder ShowStatusBar -bool true
+
+- name: Show the Path Bar in Finder
+  shell: defaults write com.apple.finder ShowPathbar -bool true
+
+- name: Restart Finder
+  shell: killall Finder
