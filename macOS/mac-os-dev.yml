@@ -31,7 +31,7 @@
 
     - name: Check if Homebrew is installed (Apple-Silicon Based Macs)
       stat:
-        path: /usr/local/bin/brew
+        path: /opt/homebrew/bin/brew
       register: homebrew_check
       when: ansible_architecture == "arm64"
 
