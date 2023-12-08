@@ -23,10 +23,17 @@
     upgrade_homebrew_packages: true
 
   pre_tasks:
-    - name: Check if Homebrew is installed
+    - name: Check if Homebrew is installed (Intel Based Macs)
       stat:
         path: /usr/local/bin/brew
       register: homebrew_check
+      when: ansible_architecture == "x86_64"
+
+    - name: Check if Homebrew is installed (Apple-Silicon Based Macs)
+      stat:
+        path: /usr/local/bin/brew
+      register: homebrew_check
+      when: ansible_architecture == "arm64"
 
     - name: Installing Homebrew
       shell: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
