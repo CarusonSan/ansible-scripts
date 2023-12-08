@@ -20,7 +20,6 @@
       - nvm
       - pnpm
       - yarn
-    upgrade_homebrew_packages: true
 
   pre_tasks:
     - name: Check if Homebrew is installed (Intel Based Macs)
@@ -44,14 +43,6 @@
     - name: Updating Homebrew
       homebrew:
         update_homebrew: true
-      when: homebrew_check.stat.exists
-
-    - name: Upgrading Homebrew Packages
-      homebrew:
-        upgrade_all: "{{ upgrade_homebrew_packages }}"
-      register: result
-      until: result is successful
-      when: homebrew_check.stat.exists
 
     - name: Installing Homebrew Cask Packages
       homebrew_cask:
@@ -59,8 +50,6 @@
         state: present
       register: result
       until: result is successful
-      when:
-        - homebrew_check.stat.exists
 
     - name: Installing Homebrew Packages
       homebrew:
@@ -68,8 +57,6 @@
         state: present
       register: result
       until: result is successful
-      when:
-        - homebrew_check.stat.exists
 
     - name: Configure nvm and install Node LTS
       import_tasks: tasks/configure-nvm-and-install-node-lts.yml
