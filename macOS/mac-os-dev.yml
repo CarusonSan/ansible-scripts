@@ -19,6 +19,7 @@
       - m-cli
       - nvm
       - pnpm
+      - watchman
       - yarn
 
   pre_tasks:
