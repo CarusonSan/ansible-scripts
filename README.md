@@ -17,6 +17,10 @@
 - `python3 -m pip install --upgrade pip`
 - `python3 -m pip install --user ansible`
 
+4. Adding JAVA_HOME to .zshrc
+
+- `echo 'export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home"' >> ~/.zshrc`
+
 ### Running Ansible Playbook
 
 > This playbook is not fully unattended due to app Logi Options + requiring password entry to install
