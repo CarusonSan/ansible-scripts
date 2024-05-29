@@ -1,0 +1,5 @@
+- name: Create the user
+  user:
+    name: { { ansible_user } }
+    state: present
+    shell: /bin/bash

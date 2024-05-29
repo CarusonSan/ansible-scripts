@@ -8,6 +8,7 @@
       - docker
       - google-chrome
       - logi-options-plus
+      - raspberry-pi-imager
       - spotify
       - visual-studio-code
       - vlc
@@ -16,7 +17,9 @@
       - whatsapp
       - zulu17
     brew_packages:
+      - ansible-lint
       - gh
+      - go
       - m-cli
       - nvm
       - pnpm
