@@ -1,7 +1,6 @@
-- name: Raspberry Pi Main Ansible Playbook
+- name: Raspberry Pi Web Server Ansible Playbook
   hosts: localhost
   connection: local
-  gather_facts: true
   become: true
 
   pre_tasks:

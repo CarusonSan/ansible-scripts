@@ -30,11 +30,11 @@ Replace the following:
 - `ip-address` is the IP address of the Raspberry Pi.
 
 ```
-scp path/to/directory username@ip-address:~
+scp -r path/to/directory username@ip-address:~
 ```
 
 ## Running Ansible Playbook
 
 ```
-ansible-playbook raspberrypi/raspberrypi.yml
+ansible-playbook raspberrypi/{ansible-script}.yml
 ```
