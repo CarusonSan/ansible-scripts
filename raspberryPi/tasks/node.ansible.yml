@@ -1,0 +1,10 @@
+- name: Add NodeSource v20 repo
+  ansible.builtin.shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+- name: Install Node.js
+  apt:
+    name: nodejs
+    update_cache: true
+- name: Install PM2
+  npm:
+    name: pm2
+    global: true

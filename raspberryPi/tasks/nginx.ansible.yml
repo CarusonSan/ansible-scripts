@@ -1,0 +1,15 @@
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+- name: Start Nginx service
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+- name: Create group 'nginx'
+  ansible.builtin.group:
+    name: "nginx"
+    local: true
+  with_items:
+    - nginx

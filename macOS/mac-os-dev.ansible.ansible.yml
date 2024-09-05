@@ -64,10 +64,10 @@
       until: result is successful
 
     - name: Configure nvm and install Node LTS
-      import_tasks: tasks/configure-nvm-and-install-node-lts.yml
+      import_tasks: tasks/configure-nvm-and-install-node-lts.ansible.yml
 
     - name: Setup git config
-      import_tasks: tasks/setup-git-config.yml
+      import_tasks: tasks/setup-git-config.ansible.yml
 
     - name: Setup dock
-      import_tasks: tasks/setup-dock.yml
+      import_tasks: tasks/setup-dock.ansible.yml
