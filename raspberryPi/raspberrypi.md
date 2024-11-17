@@ -4,19 +4,17 @@ The following Ansible playbooks are available:
 
 - [Local Web Server](web-server.yml)
 
-## Prerequisites
-
-1. Install pipx:
+## Update Raspberry Pi and Install pip | pipx | Ansible
 
 ```
-sudo apt install pipx
-```
-
-2. Install ansible-core:
-
-```
-1. pipx install --include-deps ansible-core
-2. pipx ensurepath
+sudo apt-get update \
+&& sudo NEEDRESTART_MODE=a apt-get dist-upgrade --yes \
+&& sudo apt-get -y install python3-pip \
+&& sudo apt -y install pipx \
+&& pipx ensurepath \
+&& source ~/.bashrc \
+&& pipx install --include-deps ansible \
+&& sudo apt autoremove -y
 ```
 
 ## Copying Ansible Playbook to Raspberry Pi

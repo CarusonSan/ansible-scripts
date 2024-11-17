@@ -17,6 +17,8 @@
   tasks:
     - name: Install Node v20.x and PM2
       ansible.builtin.import_tasks: tasks/node.ansible.yml
+    - name: Install Docker
+      ansible.builtin.import_tasks: tasks/docker.ansible.yml
 
   post_tasks:
     - name: APT-GET AUTOCLEAN && AUTOREMOVE
