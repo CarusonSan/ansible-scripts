@@ -1,5 +1,5 @@
-- name: Add NodeSource v20 repo
-  ansible.builtin.shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+- name: Add NodeSource v22 repo
+  ansible.builtin.shell: curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
   state: present
 - name: Install Node.js
   ansible.builtin.apt:
