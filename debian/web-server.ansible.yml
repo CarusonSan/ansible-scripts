@@ -1,0 +1,32 @@
+---
+- name: Setup Web Server Ansible Playbook
+  hosts: localhost
+  connection: local
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+
+  tasks:
+    - name: Install Node.js v22.x and PM2
+      ansible.builtin.import_tasks: tasks/node.ansible.yml
+
+    - name: Install Docker and related packages
+      ansible.builtin.import_tasks: tasks/docker.ansible.yml
+
+    - name: Install and configure Nginx
+      ansible.builtin.import_tasks: tasks/nginx.ansible.yml
+
+  post_tasks:
+    - name: Clean up apt cache and remove unused packages
+      ansible.builtin.apt:
+        autoclean: true
+        autoremove: true

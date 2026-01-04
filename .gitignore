@@ -1,0 +1,64 @@
+# Ansible
+*.retry
+*.log
+.vault_pass
+.vault_password
+.ansible/.lock
+.ansible/tmp/
+
+# Sensitive files
+secrets.yml
+vault.yml
+*secret*
+*password*
+credentials.yml
+*.key
+*.pem
+*.crt
+
+# Environment files
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python (if using Ansible with Python virtual environments)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+ENV/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# Ansible Galaxy
+roles/
+collections/
+
+# Terraform (if mixed with Ansible)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Dynamic inventory
+inventory/dynamic/
+hosts.generated
