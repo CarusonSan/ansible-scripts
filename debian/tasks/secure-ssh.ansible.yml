@@ -1,0 +1,94 @@
+---
+- name: Create administrative user
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    shell: /bin/bash
+    create_home: true
+    groups: sudo
+    append: true
+    state: present
+
+- name: Set up SSH directory for admin user
+  ansible.builtin.file:
+    path: "/home/{{ admin_user }}/.ssh"
+    state: directory
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: "0700"
+
+- name: Add SSH public key for admin user
+  ansible.builtin.authorized_key:
+    user: "{{ admin_user }}"
+    key: "{{ admin_ssh_public_key }}"
+    state: present
+  when: admin_ssh_public_key is defined
+
+- name: Allow sudo group to use sudo without password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/sudo-group
+    line: "%sudo ALL=(ALL:ALL) NOPASSWD:ALL"
+    create: true
+    validate: "visudo -cf %s"
+    mode: "0440"
+  when: passwordless_sudo | default(false)
+
+- name: Configure SSH daemon for security
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    validate: "sshd -t -f %s"
+  loop:
+    - regexp: "^#?PermitRootLogin"
+      line: "PermitRootLogin no"
+    - regexp: "^#?PasswordAuthentication"
+      line: "PasswordAuthentication no"
+    - regexp: "^#?PubkeyAuthentication"
+      line: "PubkeyAuthentication yes"
+    - regexp: "^#?PermitEmptyPasswords"
+      line: "PermitEmptyPasswords no"
+    - regexp: "^#?ChallengeResponseAuthentication"
+      line: "ChallengeResponseAuthentication no"
+    - regexp: "^#?X11Forwarding"
+      line: "X11Forwarding no"
+  notify: Restart SSH service
+
+- name: Change SSH port (optional)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?Port"
+    line: "Port {{ ssh_port }}"
+    state: present
+    validate: "sshd -t -f %s"
+  when: ssh_port is defined and ssh_port != 22 and ssh_port != ""
+  notify: Restart SSH service
+
+- name: Install fail2ban
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+    update_cache: true
+
+- name: Configure fail2ban for SSH
+  ansible.builtin.copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      [DEFAULT]
+      bantime = 3600
+      findtime = 600
+      maxretry = 5
+
+      [sshd]
+      enabled = true
+      port = {{ ssh_port | default(22) }}
+      filter = sshd
+      logpath = /var/log/auth.log
+    mode: "0644"
+  notify: Restart fail2ban service
+
+- name: Start and enable fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true

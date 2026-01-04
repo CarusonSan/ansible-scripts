@@ -1,0 +1,75 @@
+---
+- name: Secure Server Setup Ansible Playbook
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars_prompt:
+    - name: admin_user
+      prompt: "Enter the username for the new admin account"
+      private: false
+      default: "admin"
+
+    - name: admin_ssh_public_key
+      prompt: "Enter the SSH public key for the admin user (paste your ~/.ssh/ionos_vps_xs.pub or ionos_vps_xs.pub content)"
+      private: false
+
+    - name: ssh_port
+      prompt: "Enter custom SSH port (leave empty for default 22)"
+      private: false
+      default: ""
+
+    - name: passwordless_sudo
+      prompt: "Allow passwordless sudo for admin user? (yes/no)"
+      private: false
+      default: "yes"
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+
+  tasks:
+    - name: Convert passwordless_sudo to boolean
+      ansible.builtin.set_fact:
+        passwordless_sudo: "{{ passwordless_sudo | lower in ['yes', 'true', 'y', '1'] }}"
+
+    - name: Secure SSH and create admin user
+      ansible.builtin.import_tasks: tasks/secure-ssh.ansible.yml
+
+  handlers:
+    - name: Restart SSH service
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
+
+    - name: Restart fail2ban service
+      ansible.builtin.service:
+        name: fail2ban
+        state: restarted
+
+  post_tasks:
+    - name: Display security information
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "Security setup completed!"
+          - "=========================================="
+          - "Admin user created: {{ admin_user }}"
+          - "Root SSH login: DISABLED"
+          - "Password authentication: DISABLED"
+          - "SSH key authentication: ENABLED"
+          - "Fail2ban: INSTALLED and ENABLED"
+          - "{{ 'SSH port changed to: ' + ssh_port if ssh_port else 'SSH port: 22 (default)' }}"
+          - ""
+          - "IMPORTANT: Before disconnecting, test SSH access with:"
+          - "{{ 'ssh -p ' + ssh_port + ' ' + admin_user + '@YOUR_SERVER_IP' if ssh_port else 'ssh ' + admin_user + '@YOUR_SERVER_IP' }}"
+          - ""
+          - "Keep this terminal session open until you verify access!"
+          - "=========================================="
