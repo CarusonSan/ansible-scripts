@@ -1,0 +1,104 @@
+---
+- name: Setup SteamCMD Ansible Playbook
+  hosts: localhost
+  connection: local
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+
+  tasks:
+    - name: Enable 32-bit architecture support
+      ansible.builtin.command: dpkg --add-architecture i386
+      args:
+        creates: /var/lib/dpkg/arch
+
+    - name: Update apt cache for multiarch
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Accept Steam license agreement
+      ansible.builtin.debconf:
+        name: steamcmd
+        question: steam/question
+        value: "I AGREE"
+        vtype: select
+
+    - name: Accept Steam license agreement (alternative)
+      ansible.builtin.debconf:
+        name: steamcmd
+        question: steam/license
+        value: ""
+        vtype: note
+
+    - name: Install SteamCMD dependencies
+      ansible.builtin.apt:
+        name:
+          - lib32gcc-s1
+          - ca-certificates
+          - software-properties-common
+        state: present
+        update_cache: true
+
+    - name: Add non-free repository for SteamCMD
+      ansible.builtin.apt_repository:
+        repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }} non-free"
+        state: present
+        filename: debian-non-free
+      when: ansible_distribution == "Debian"
+
+    - name: Add multiverse repository for SteamCMD (Ubuntu)
+      ansible.builtin.apt_repository:
+        repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} multiverse"
+        state: present
+        filename: ubuntu-multiverse
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Update apt cache after adding repositories
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install SteamCMD
+      ansible.builtin.apt:
+        name: steamcmd
+        state: present
+        update_cache: true
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: Create symbolic link for steamcmd
+      ansible.builtin.file:
+        src: /usr/games/steamcmd
+        dest: /usr/local/bin/steamcmd
+        state: link
+
+    - name: Create steam user for running game servers
+      ansible.builtin.user:
+        name: steam
+        system: true
+        create_home: true
+        home: /home/steam
+        shell: /bin/bash
+        comment: Steam game server user
+
+    - name: Set permissions on steam home directory
+      ansible.builtin.file:
+        path: /home/steam
+        state: directory
+        owner: steam
+        group: steam
+        mode: '0755'
+
+  post_tasks:
+    - name: Clean up apt cache and remove unused packages
+      ansible.builtin.apt:
+        autoclean: true
+        autoremove: true
